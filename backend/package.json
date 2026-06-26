@@ -1,0 +1,18 @@
+{
+  "name": "projectdelhi-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Projectdelhi",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "google-auth-library": "^9.6.3",
+    "mongoose": "^8.2.0",
+    "nodemailer": "^9.0.1"
+  }
+}
