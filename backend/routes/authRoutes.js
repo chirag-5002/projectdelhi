@@ -8,6 +8,111 @@ const { logActivity } = require("../utils/activityLogger");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Test SMTP email route to diagnose connection and credential issues
+router.get("/auth/test-email", async (req, res) => {
+  try {
+    const targetEmail = req.query.email || process.env.ADMIN_EMAIL || "test@example.com";
+    console.log(`[TEST EMAIL] Attempting test email to: ${targetEmail}`);
+
+    const nodemailer = require("nodemailer");
+    
+    // Log configuration parameters (obfuscating password)
+    const smtpConfig = {
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || "587"),
+      secure: process.env.SMTP_PORT === "465",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS ? `${process.env.SMTP_PASS.substring(0, 3)}***` : "missing",
+      },
+    };
+
+    console.log("[TEST EMAIL] SMTP Config:", JSON.stringify(smtpConfig, null, 2));
+
+    const testTransporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: smtpConfig.port,
+      secure: smtpConfig.secure,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    // 1. Verify Transporter connection
+    const verification = await new Promise((resolve) => {
+      testTransporter.verify((err, success) => {
+        if (err) {
+          console.error("[TEST EMAIL] SMTP verification failed:", err);
+          resolve({ success: false, error: err.message, code: err.code, command: err.command });
+        } else {
+          console.log("[TEST EMAIL] SMTP verification succeeded!");
+          resolve({ success: true });
+        }
+      });
+    });
+
+    if (!verification.success) {
+      return res.status(500).json({
+        success: false,
+        phase: "verification",
+        error: verification.error,
+        code: verification.code,
+        command: verification.command,
+        smtpConfig
+      });
+    }
+
+    // 2. Try sending a basic test email
+    const mailOptions = {
+      from: process.env.SMTP_FROM || '"Project Delhi Test" <info@projectdelhi.org>',
+      to: targetEmail,
+      subject: "Project Delhi - SMTP Connection Test",
+      text: "If you receive this email, your SMTP configuration on Render is working perfectly!",
+      html: "<p>If you receive this email, your SMTP configuration on Render is working perfectly!</p>"
+    };
+
+    const sendResult = await new Promise((resolve) => {
+      testTransporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          console.error("[TEST EMAIL] Send mail failed:", err);
+          resolve({ success: false, error: err.message, code: err.code, command: err.command });
+        } else {
+          console.log("[TEST EMAIL] Send mail succeeded:", info.messageId);
+          resolve({ success: true, messageId: info.messageId, response: info.response });
+        }
+      });
+    });
+
+    if (!sendResult.success) {
+      return res.status(500).json({
+        success: false,
+        phase: "sending",
+        error: sendResult.error,
+        code: sendResult.code,
+        command: sendResult.command,
+        smtpConfig
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: `Test email sent successfully! Message ID: ${sendResult.messageId}`,
+      response: sendResult.response,
+      smtpConfig
+    });
+
+  } catch (error) {
+    console.error("[TEST EMAIL] Route exception:", error);
+    res.status(500).json({
+      success: false,
+      phase: "exception",
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 // Get all users
 router.get("/users", async (req, res) => {
   try {
