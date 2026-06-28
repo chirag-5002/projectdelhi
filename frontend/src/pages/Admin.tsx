@@ -600,6 +600,19 @@ export default function Admin({ addToast }: Props) {
                         >
                           {task.isFeatured ? "★ Featured" : "☆ Make Featured"}
                         </button>
+                        <button
+                          className="btn btn-outline btn-sm"
+                          onClick={() => handleStartEditProposal(task)}
+                          style={{ color: "var(--primary)", borderColor: "var(--primary)" }}
+                        >
+                          ✏️ Edit Details
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDeleteProposal(task.id)}
+                        >
+                          ✕ Delete
+                        </button>
                       </div>
                     )}
                   </div>

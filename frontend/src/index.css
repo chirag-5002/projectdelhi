@@ -351,7 +351,7 @@ body {
 /* Stats */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 16px;
   margin-top: 48px;
 }
@@ -859,7 +859,7 @@ select {
 /* How it works */
 .steps-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 24px;
 }
 .step-card {
@@ -1033,7 +1033,7 @@ select {
 /* Features / Impact Areas */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
   gap: 24px;
 }
 .feature-card {
@@ -1425,5 +1425,51 @@ select {
     width: 100% !important;
     margin-top: 0;
     margin-bottom: 24px;
+  }
+}
+
+/* Profile Dropdown Styles */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+}
+.dropdown-item:hover {
+  background: var(--sand-light) !important;
+  color: var(--primary) !important;
+}
+.dropdown-item-danger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  color: var(--danger);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+.dropdown-item-danger:hover {
+  background: rgba(239, 68, 68, 0.05) !important;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

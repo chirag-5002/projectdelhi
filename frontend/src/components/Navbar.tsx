@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { LogOut, X } from "lucide-react";
 import { getCurrentUser, userLogout } from "../store";
 import { LogoFull } from "./Logo";
 
@@ -10,6 +10,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [logoSize, setLogoSize] = useState(window.innerWidth < 480 ? 44 : 72);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -106,42 +107,142 @@ export default function Navbar() {
           </Link>
           {user ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "8px" }} className="navbar-profile-section">
-              <div 
-                style={{ 
-                  display: "flex", 
-                  alignItems: "center", 
-                  gap: "8px", 
-                  padding: "6px 12px", 
-                  borderRadius: "30px", 
-                  background: "rgba(140, 36, 36, 0.05)", 
-                  border: "1px solid rgba(140, 36, 36, 0.1)" 
-                }}
-              >
+              <div style={{ position: "relative" }}>
                 <div 
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                   style={{ 
-                    width: "28px", 
-                    height: "28px", 
-                    borderRadius: "50%", 
-                    background: "var(--primary)", 
-                    color: "white", 
                     display: "flex", 
                     alignItems: "center", 
-                    justifyContent: "center", 
-                    fontSize: "0.85rem", 
-                    fontWeight: 700 
+                    gap: "8px", 
+                    padding: "6px 12px", 
+                    borderRadius: "30px", 
+                    background: "rgba(140, 36, 36, 0.05)", 
+                    border: "1px solid rgba(140, 36, 36, 0.1)",
+                    cursor: "pointer",
+                    transition: "background 0.2s, transform 0.1s"
                   }}
+                  onMouseOver={(e) => (e.currentTarget.style.background = "rgba(140, 36, 36, 0.1)")}
+                  onMouseOut={(e) => (e.currentTarget.style.background = "rgba(140, 36, 36, 0.05)")}
                 >
-                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  <div 
+                    style={{ 
+                      width: "28px", 
+                      height: "28px", 
+                      borderRadius: "50%", 
+                      background: "var(--primary)", 
+                      color: "white", 
+                      display: "flex", 
+                      alignItems: "center", 
+                      justifyContent: "center", 
+                      fontSize: "0.85rem", 
+                      fontWeight: 700 
+                    }}
+                  >
+                    {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: "1.2" }}>
+                    <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)" }}>
+                      {user.name}
+                    </span>
+                    <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                      {user.role === "USER" ? "User" : user.role === "MODERATOR" ? "Moderator" : "Admin"}
+                    </span>
+                  </div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: "1.2" }}>
-                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)" }}>
-                    {user.name}
-                  </span>
-                  <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.3px" }}>
-                    {user.role}
-                  </span>
-                </div>
+
+                {showProfileDropdown && (
+                  <>
+                    <div 
+                      onClick={() => setShowProfileDropdown(false)}
+                      style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 999,
+                        background: "transparent"
+                      }}
+                    />
+                    <div 
+                      style={{
+                        position: "absolute",
+                        top: "calc(100% + 8px)",
+                        left: 0,
+                        background: "var(--bg-card)",
+                        border: "1px solid var(--border-light)",
+                        borderRadius: "16px",
+                        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05)",
+                        width: "260px",
+                        zIndex: 1000,
+                        padding: "16px",
+                        textAlign: "left",
+                        animation: "slideDown 0.2s ease-out"
+                      }}
+                    >
+                      {/* User Header */}
+                      <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "12px" }}>
+                        <div 
+                          style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "50%",
+                            background: "var(--primary)",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "1.1rem",
+                            fontWeight: 700,
+                            flexShrink: 0
+                          }}
+                        >
+                          {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+                          <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {user.name}
+                          </span>
+                          <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {user.email}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Role Details */}
+                      <div 
+                        style={{
+                          background: "rgba(0,0,0,0.02)",
+                          borderRadius: "10px",
+                          padding: "10px 12px",
+                          border: "1px solid var(--border-light)",
+                          fontSize: "0.8rem",
+                          marginTop: "8px"
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "var(--text-secondary)", fontWeight: 500 }}>Account Role</span>
+                          <span 
+                            style={{
+                              fontSize: "0.65rem",
+                              fontWeight: 700,
+                              color: "var(--primary)",
+                              background: "rgba(140, 36, 36, 0.08)",
+                              padding: "2px 8px",
+                              borderRadius: "6px",
+                              textTransform: "uppercase"
+                            }}
+                          >
+                            {user.role === "ADMIN" ? "Admin" : user.role === "MODERATOR" ? "Moderator" : "User"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
+
+              {/* Logout Button (separately in navbar) */}
               <button
                 onClick={handleLogout}
                 className="btn btn-sm"

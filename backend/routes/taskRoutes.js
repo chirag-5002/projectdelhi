@@ -24,6 +24,26 @@ const sanitizeTaskData = (data) => {
 // Get all tasks
 router.get("/tasks", async (req, res) => {
   try {
+    // Automatically transition past approved events to "completed" status
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const approvedTasks = await Task.find({ status: "approved" });
+    for (const task of approvedTasks) {
+      if (task.eventDate) {
+        const dateParts = task.eventDate.split('-');
+        if (dateParts.length === 3) {
+          const [year, month, day] = dateParts.map(Number);
+          const duration = task.eventDuration || 1;
+          const endOfEvent = new Date(year, month - 1, day + duration);
+          if (today >= endOfEvent) {
+            task.status = "completed";
+            await task.save();
+          }
+        }
+      }
+    }
+
     const tasks = await Task.find({});
     res.json(tasks);
   } catch (error) {
