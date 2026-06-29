@@ -65,7 +65,7 @@ export function LogoFull({ size = 48, className = "" }: LogoProps) {
           <span
             style={{
               fontFamily: "var(--font)",
-              fontSize: `${(size / 48) * 0.44}rem`,
+              fontSize: `max(10px, ${(size / 48) * 0.44}rem)`,
               fontWeight: 700,
               color: "var(--text-secondary)",
               letterSpacing: "0.8px",

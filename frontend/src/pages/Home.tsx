@@ -23,9 +23,9 @@ export default function Home() {
     let targetId = "";
     if (location.pathname === "/campaigns") {
       targetId = "success-stories";
-    } else if (location.pathname === "/features") {
+    } else if (location.pathname === "/impact-areas") {
       targetId = "impact-areas";
-    } else if (location.pathname === "/volunteer-guide") {
+    } else if (location.pathname === "/how-it-works") {
       targetId = "volunteer-guide";
     }
 
@@ -93,10 +93,7 @@ export default function Home() {
             <span className="highlight">Transform Delhi</span>
           </h1>
           <p style={{ color: "#ffffff", fontWeight: 500, textShadow: "0 2px 12px rgba(0, 0, 0, 0.85), 0 1px 4px rgba(0, 0, 0, 0.6)" }}>
-            Projectdelhi is a unified platform connecting civic-minded
-            individuals, NGOs, and local authorities. Launch initiatives,
-            mobilize volunteers, and drive measurable social impact across the
-            capital.
+            ProjectDelhi is a unified civic platform that empowers citizens, NGOs, volunteers, and local authorities to collaborate, lead meaningful initiatives, and create measurable social impact across the capital.
           </p>
           <div className="hero-actions">
             <Link to="/submit" className="btn btn-primary btn-lg">
@@ -133,8 +130,8 @@ export default function Home() {
               <div className="stat-label">Registered Volunteers</div>
             </div>
             <div className="card stat-card">
-              <div className="stat-number">{stats.localities}</div>
-              <div className="stat-label">Zones Impacted</div>
+              <div className="stat-number">{stats.eventsConducted}</div>
+              <div className="stat-label">Events Conducted</div>
             </div>
             <div className="card stat-card">
               <div className="stat-number">{stats.totalPending}</div>
@@ -149,38 +146,35 @@ export default function Home() {
       <section
         id="impact-areas"
         className="page-section"
-        style={{ background: "var(--bg-card)" }}
+        style={{ background: "var(--bg-card)", scrollMarginTop: "110px" }}
       >
         <div className="container">
           <div className="section-header">
-            <h2>Areas of Impact</h2>
+            <h2>Where Change Begins</h2>
             <p>
-              Our community focuses on key categories to maximize sustainable
-              development
+              Focused pathways to mobilize citizens and transform our neighborhoods.
             </p>
           </div>
           <div className="features-grid">
             <div className="card feature-card card-flat">
               <div className="feature-icon">
-                <Leaf size={24} />
+                <Users size={24} />
               </div>
               <div className="feature-content">
-                <h3>Environmental Action</h3>
+                <h3>People First</h3>
                 <p>
-                  Tree plantation drives, park cleanups, and waste management
-                  initiatives in urban areas.
+                  Empowering communities through education, healthcare, inclusion, livelihoods, and essential social support.
                 </p>
               </div>
             </div>
             <div className="card feature-card card-flat">
               <div className="feature-icon">
-                <BookOpen size={24} />
+                <Leaf size={24} />
               </div>
               <div className="feature-content">
-                <h3>Education & Mentorship</h3>
+                <h3>Green Tomorrow</h3>
                 <p>
-                  Volunteer tutoring, skill workshops, and resource distribution
-                  for underprivileged youth.
+                  Promoting a cleaner, greener and pollution free Delhi through conservation, sustainability, and resilient urban initiatives.
                 </p>
               </div>
             </div>
@@ -189,10 +183,9 @@ export default function Home() {
                 <HeartHandshake size={24} />
               </div>
               <div className="feature-content">
-                <h3>Community Relief</h3>
+                <h3>Collective Impact</h3>
                 <p>
-                  Food distribution, health camps, and emergency support for
-                  vulnerable neighborhoods.
+                  Uniting citizens, NGOs, volunteers, and institutions to collaborate, innovate, and create lasting civic impact.
                 </p>
               </div>
             </div>
@@ -201,45 +194,40 @@ export default function Home() {
       </section>
 
       {/* How it Works / Volunteer Guide */}
-      <section id="volunteer-guide" className="page-section">
+      <section id="volunteer-guide" className="page-section" style={{ scrollMarginTop: "110px" }}>
         <div className="container">
           <div className="section-header">
-            <h2>Volunteer Guide</h2>
+            <h2>Your Journey to Change</h2>
             <p>
-              New to Projectdelhi? Here is how you can start making an impact
-              in your neighborhood.
+              Every great change begins with a single step. Join ProjectDelhi and become part of a community that's shaping a better future for the city.
             </p>
           </div>
           <div className="steps-grid">
             <div className="card step-card">
               <div className="step-num">
-                <PlusCircle size={24} />
+                <Globe size={24} />
               </div>
-              <h3>1. Discover Projects</h3>
+              <h3>Discover Your Cause</h3>
               <p>
-                Browse active campaigns in your area. Use filters to find causes
-                that match your skills—from teaching to environmental action.
-              </p>
-            </div>
-            <div className="card step-card">
-              <div className="step-num">
-                <Shield size={24} />
-              </div>
-              <h3>2. Register & Connect</h3>
-              <p>
-                Sign up as a volunteer for a specific task. You'll get access to
-                the organizer's contact info and coordination details.
+                Explore meaningful initiatives across Delhi and find a project that aligns with your passion, skills, or interests.
               </p>
             </div>
             <div className="card step-card">
               <div className="step-num">
                 <Users size={24} />
               </div>
-              <h3>3. Take Action</h3>
+              <h3>Join the Mission</h3>
               <p>
-                Show up, contribute, and document your impact. Verified
-                volunteers can earn community badges and lead future
-                initiatives.
+                Sign up in just a few clicks, connect with the project organizer, and get everything you need to start volunteering.
+              </p>
+            </div>
+            <div className="card step-card">
+              <div className="step-num">
+                <CheckCircle size={24} />
+              </div>
+              <h3>Create Real Impact</h3>
+              <p>
+                Contribute your time, inspire others, and help build a cleaner, stronger, and more inclusive Delhi—one initiative at a time.
               </p>
             </div>
           </div>
@@ -251,7 +239,7 @@ export default function Home() {
         <section
           id="success-stories"
           className="page-section"
-          style={{ background: "var(--bg-card)" }}
+          style={{ background: "var(--bg-card)", scrollMarginTop: "110px" }}
         >
           <div className="container">
             <div className="section-header">
@@ -370,8 +358,7 @@ export default function Home() {
                   margin: "0 auto 48px",
                 }}
               >
-                Whether you want to lead or support, your voice creates ripples
-                of change. Start today and be part of Delhi's transformation.
+                Whether you want to lead or support, your effort makes a real difference. Start today and be part of Delhi's transformation.
               </p>
 
               <div

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getTaskById, getTaskBySlug, slugify, addVolunteerApp, getCurrentUser, registerGeneralPartner, getFeaturedTasks, getApprovedTasks } from '../store';
 import { CATEGORY_META } from '../types';
@@ -40,6 +40,15 @@ export default function TaskDetail({ addToast }: Props) {
       setTask(getTaskById(id));
     }
   }, [slug, id]);
+
+  const lastToastTaskId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (task && task.volunteers.length >= task.volunteersNeeded && lastToastTaskId.current !== task.id) {
+      lastToastTaskId.current = task.id;
+      addToast("For this event volunteer slots occupied. You can volunteer for other events those are live currently as has spot left.", "info");
+    }
+  }, [task, addToast]);
 
   useEffect(() => {
     if (currentUser) {

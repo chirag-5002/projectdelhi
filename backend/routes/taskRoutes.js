@@ -199,15 +199,36 @@ router.get("/stats", async (req, res) => {
   try {
     const tasks = await Task.find({});
     const approved = tasks.filter((t) => t.status === "approved");
-    const totalVolunteers = approved.reduce((sum, t) => sum + t.volunteers.length, 0);
+    const completed = tasks.filter((t) => t.status === "completed");
     const pendingCount = tasks.filter((t) => t.status === "pending").length;
-    const uniqueLocalities = [...new Set(approved.map((t) => t.locality))].length;
+
+    // Calculate active + completed volunteers
+    const activeVolunteersCount = [...approved, ...completed].reduce(
+      (sum, t) => sum + (t.volunteers ? t.volunteers.length : 0),
+      0
+    );
+
+    // Calculate volunteers from deleted tasks
+    const deletedTasks = await DeletedTask.find({});
+    const deletedVolunteersCount = deletedTasks.reduce(
+      (sum, t) => sum + (t.volunteers ? t.volunteers.length : 0),
+      0
+    );
+
+    const totalVolunteers = activeVolunteersCount + deletedVolunteersCount;
+
+    // Calculate events conducted: completed in Task + completed in DeletedTask
+    const completedTasksCount = completed.length;
+    const completedDeletedTasksCount = deletedTasks.filter((t) => t.status === "completed").length;
+    const eventsConducted = completedTasksCount + completedDeletedTasksCount;
 
     res.json({
       totalTasks: approved.length,
       totalVolunteers,
       totalPending: pendingCount,
-      localities: uniqueLocalities
+      eventsConducted,
+      deletedVolunteersCount,
+      deletedEventsConductedCount: completedDeletedTasksCount
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

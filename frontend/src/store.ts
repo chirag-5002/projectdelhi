@@ -20,19 +20,25 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001
 let cachedTasks: TaskRequest[] = [];
 let cachedApps: VolunteerApp[] = [];
 let cachedUsers: { email: string; name: string; role: Role }[] = [];
+let deletedVolunteersCount = 0;
+let deletedEventsConductedCount = 0;
 
 // Initialize store by fetching initial data from backend
 export async function initStore(): Promise<void> {
   try {
-    const [tasksRes, appsRes, usersRes] = await Promise.all([
+    const [tasksRes, appsRes, usersRes, statsRes] = await Promise.all([
       fetch(`${API_BASE_URL}/tasks`),
       fetch(`${API_BASE_URL}/volunteer-apps`),
       fetch(`${API_BASE_URL}/users`),
+      fetch(`${API_BASE_URL}/stats`),
     ]);
-    if (tasksRes.ok && appsRes.ok && usersRes.ok) {
+    if (tasksRes.ok && appsRes.ok && usersRes.ok && statsRes.ok) {
       cachedTasks = await tasksRes.json();
       cachedApps = await appsRes.json();
       cachedUsers = await usersRes.json();
+      const statsData = await statsRes.json();
+      deletedVolunteersCount = statsData.deletedVolunteersCount || 0;
+      deletedEventsConductedCount = statsData.deletedEventsConductedCount || 0;
       console.log("Successfully synchronized store cache with backend.");
       return;
     }
@@ -261,6 +267,11 @@ export async function deleteProposal(
 ): Promise<void> {
   const idx = cachedTasks.findIndex((t) => t.id === id);
   if (idx !== -1) {
+    const task = cachedTasks[idx];
+    if (task.status === "completed") {
+      deletedEventsConductedCount += 1;
+    }
+    deletedVolunteersCount += (task.volunteers?.length || 0);
     cachedTasks.splice(idx, 1);
   }
 
@@ -621,15 +632,17 @@ export function resetToSeedData(): void {
 
 export function getStats() {
   const approved = cachedTasks.filter((t) => t.status === "approved");
-  const totalVolunteers = approved.reduce(
-    (sum, t) => sum + t.volunteers.length,
-    0,
-  );
+  const completed = cachedTasks.filter((t) => t.status === "completed");
+  const totalVolunteers = [...approved, ...completed].reduce(
+    (sum, t) => sum + (t.volunteers?.length || 0),
+    0
+  ) + deletedVolunteersCount;
+  
   return {
     totalTasks: approved.length,
     totalVolunteers,
     totalPending: cachedTasks.filter((t) => t.status === "pending").length,
-    localities: [...new Set(approved.map((t) => t.locality))].length,
+    eventsConducted: completed.length + deletedEventsConductedCount,
   };
 }
 

@@ -938,9 +938,6 @@ select {
   .container {
     padding: 0 16px;
   }
-  .logo-subtitle {
-    display: none !important;
-  }
   .mobile-toggle {
     display: block;
   }
