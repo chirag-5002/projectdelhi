@@ -37,7 +37,7 @@ export function LogoFull({ size = 48, className = "" }: LogoProps) {
       className={className}
     >
       <LogoIcon size={size} />
-      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "stretch" }}>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "stretch", width: "max-content" }}>
         <span
           style={{
             fontFamily: "var(--font)",
