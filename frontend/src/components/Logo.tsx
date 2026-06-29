@@ -47,6 +47,8 @@ export function LogoFull({ size = 48, className = "" }: LogoProps) {
             lineHeight: 1.05,
             letterSpacing: "-0.5px",
             textAlign: "center",
+            display: "block",
+            width: "100%",
           }}
         >
           projectdelhi<span style={{ color: "var(--terracotta)", fontWeight: 700 }}>.org</span>
@@ -56,12 +58,11 @@ export function LogoFull({ size = 48, className = "" }: LogoProps) {
           style={{
             display: "flex",
             alignItems: "center",
-            width: "100%",
             gap: "8px",
             marginTop: "4px",
           }}
         >
-          <div style={{ flex: 1, height: "1px", background: "var(--text-secondary)", opacity: 0.25 }} />
+          <div style={{ width: `${(size / 48) * 12}px`, height: "1px", background: "var(--text-secondary)", opacity: 0.25 }} />
           <span
             style={{
               fontFamily: "var(--font)",
@@ -76,7 +77,7 @@ export function LogoFull({ size = 48, className = "" }: LogoProps) {
           >
             Together for a Better Delhi
           </span>
-          <div style={{ flex: 1, height: "1px", background: "var(--text-secondary)", opacity: 0.25 }} />
+          <div style={{ width: `${(size / 48) * 12}px`, height: "1px", background: "var(--text-secondary)", opacity: 0.25 }} />
         </div>
       </div>
     </div>
