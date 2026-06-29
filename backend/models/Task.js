@@ -49,7 +49,8 @@ const TaskSchema = new mongoose.Schema({
   userQueryStatus: { type: String, default: null },
   chatMessages: { type: [ChatMessageSchema], default: [] },
   rejectionReason: { type: String, default: "" },
-  isFeatured: { type: Boolean, default: false }
+  isFeatured: { type: Boolean, default: false },
+  imageUrl: { type: String, default: "" }
 });
 
 module.exports = mongoose.model("Task", TaskSchema);

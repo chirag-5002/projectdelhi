@@ -39,7 +39,7 @@ export default function TaskCard({ task }: { task: TaskRequest }) {
     >
       <div className="task-card-image-wrapper">
         <img
-          src={`/categories/${task.category || 'other'}.jpg`}
+          src={task.imageUrl || `/categories/${task.category || 'other'}.jpg`}
           alt={task.title}
           className="task-card-image"
           onError={(e) => {

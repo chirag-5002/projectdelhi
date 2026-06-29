@@ -547,7 +547,7 @@ Learn details and register here: ${eventUrl}`;
                 <div className="phone-screen">
                   <div 
                     className="screen-wallpaper" 
-                    style={{ backgroundImage: `url('/categories/${featuredTask.category || 'other'}.jpg')` }}
+                    style={{ backgroundImage: `url('${featuredTask.imageUrl || `/categories/${featuredTask.category || 'other'}.jpg`}')` }}
                   >
                     <div className="screen-wallpaper-overlay"></div>
                     <span className="priority-badge">HIGH IMPACT</span>
