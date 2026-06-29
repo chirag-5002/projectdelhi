@@ -109,6 +109,11 @@ export default function VolunteerDashboard({
     e.preventDefault();
     if (!editingProposal) return;
 
+    if (!editPincode.trim().startsWith("11")) {
+      addToast("Not a Delhi pincode. This platform only supports Delhi initiatives.", "error");
+      return;
+    }
+
     try {
       await adminEditProposal(editingProposal.id, {
         title: editTitle,

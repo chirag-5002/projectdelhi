@@ -392,6 +392,12 @@ export default function UserDashboard({ addToast }: Props) {
             <XCircle size={12} /> Rejected
           </span>
         );
+      case "completed":
+        return (
+          <span className="tag" style={{ background: "rgba(107, 114, 128, 0.1)", color: "var(--text-secondary)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <CheckCircle size={12} /> Conducted / Completed
+          </span>
+        );
       default:
         return null;
     }
@@ -524,10 +530,10 @@ export default function UserDashboard({ addToast }: Props) {
                         <strong style={{ color: "var(--text-secondary)" }}>Locality:</strong> {proposal.locality} ({proposal.pincode})
                       </div>
                       <div>
-                        <strong style={{ color: "var(--text-secondary)" }}>Proposed Date & Time:</strong> {proposal.eventDate} {proposal.eventTime ? `at ${proposal.eventTime}` : ''}
+                        <strong style={{ color: "var(--text-secondary)" }}>{proposal.status === "completed" ? "Date & Time:" : "Proposed Date & Time:"}</strong> {proposal.eventDate} {proposal.eventTime ? `at ${proposal.eventTime}` : ''}
                       </div>
                       <div>
-                        <strong style={{ color: "var(--text-secondary)" }}>Volunteers:</strong> {proposal.volunteersNeeded} requested
+                        <strong style={{ color: "var(--text-secondary)" }}>Volunteers:</strong> {proposal.volunteersNeeded}
                       </div>
                     </div>
 
@@ -577,7 +583,7 @@ export default function UserDashboard({ addToast }: Props) {
 
                     {/* Proposer Revision Action Buttons */}
                     <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "20px" }}>
-                      {(proposal.status === "pending" || proposal.allowUserEdit) && (
+                      {proposal.status !== "completed" && (proposal.status === "pending" || proposal.allowUserEdit) && (
                         <button
                           onClick={() => handleOpenEditModal(proposal)}
                           className="btn btn-secondary btn-sm"
@@ -595,7 +601,7 @@ export default function UserDashboard({ addToast }: Props) {
                           <Trash2 size={14} /> Cancel Proposal
                         </button>
                       )}
-                      {proposal.status !== "pending" && !proposal.allowUserEdit && proposal.userQueryStatus !== "pending" && (
+                      {proposal.status !== "pending" && proposal.status !== "completed" && !proposal.allowUserEdit && proposal.userQueryStatus !== "pending" && (
                         <button
                           onClick={() => handleOpenQueryModal(proposal)}
                           className="btn btn-primary btn-sm"
@@ -604,7 +610,7 @@ export default function UserDashboard({ addToast }: Props) {
                           <HelpCircle size={14} /> Request Revision/Cancellation
                         </button>
                       )}
-                      {(proposal.status === "pending" || proposal.status === "verified" || proposal.moderatorRequest) && (
+                      {proposal.status !== "completed" && (proposal.status === "pending" || proposal.status === "verified" || proposal.moderatorRequest) && (
                         <button
                           onClick={() => { setChatProposal(proposal); setIsChatOpen(true); }}
                           className="btn btn-outline btn-sm"

@@ -923,6 +923,10 @@ select {
   background: #fee2e2;
   color: #991b1b;
 }
+.status-completed {
+  background: #f3f4f6;
+  color: #4b5563;
+}
 
 /* Mobile menu */
 .mobile-toggle {

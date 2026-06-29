@@ -341,7 +341,7 @@ export default function TaskDetail({ addToast }: Props) {
 
 Campaign Initiative: ${title}
 Category: ${catData.label}
-Date & Time: ${task?.eventDate} ${task?.eventTime ? `at ${task.eventTime}` : ''}
+${task?.status === "approved" || task?.status === "completed" ? "Date & Time" : "Proposed Date & Time"}: ${task?.eventDate} ${task?.eventTime ? `at ${task.eventTime}` : ""}
 Location: ${task?.address}, ${task?.locality}
 Volunteers Needed: ${task?.volunteersNeeded}
 
@@ -404,12 +404,12 @@ Learn details and register here: ${eventUrl}`;
         <div className="card" style={{ marginBottom: 24 }}>
           <div className="task-info-grid">
             <div className="info-block">
-              <label>📅 Date</label>
+              <label>{task.status === "approved" || task.status === "completed" ? "📅 Date" : "📅 Proposed Date"}</label>
               <span>{eventDate}</span>
             </div>
             <div className="info-block">
-              <label>🕐 Time</label>
-              <span>{task.eventTime || 'To be Decided'}</span>
+              <label>{task.status === "approved" || task.status === "completed" ? "🕐 Time" : "🕐 Proposed Time"}</label>
+              <span>{task.eventTime || "To be Decided"}</span>
             </div>
             <div className="info-block">
               <label>⏳ Duration</label>
@@ -836,7 +836,7 @@ Learn details and register here: ${eventUrl}`;
 
 Campaign Initiative: ${task.title}
 Category: ${catData.label}
-Date & Time: ${task.eventDate} ${task.eventTime ? `at ${task.eventTime}` : ''}
+${task.status === "approved" || task.status === "completed" ? "Date & Time" : "Proposed Date & Time"}: ${task.eventDate} ${task.eventTime ? `at ${task.eventTime}` : ""}
 Location: ${task.address}, ${task.locality}
 Volunteers Needed: ${task.volunteersNeeded}
 

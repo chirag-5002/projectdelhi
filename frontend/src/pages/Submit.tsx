@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { addTask, getCurrentUser } from "../store";
@@ -34,6 +34,7 @@ interface Suggestion {
     postcode?: string;
     suburb?: string;
     neighbourhood?: string;
+    quarter?: string;
     city?: string;
   };
 }
@@ -43,6 +44,15 @@ function MapUpdater({ center }: { center: [number, number] }) {
   useEffect(() => {
     map.setView(center, 16);
   }, [center, map]);
+  return null;
+}
+
+function MapEventsHandler({ onMapClick }: { onMapClick: (lat: number, lon: number) => void }) {
+  useMapEvents({
+    click(e) {
+      onMapClick(e.latlng.lat, e.latlng.lng);
+    },
+  });
   return null;
 }
 
@@ -60,6 +70,10 @@ export default function Submit({ addToast }: Props) {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [locality, setLocality] = useState("");
+  const [shortDescText, setShortDescText] = useState("");
+  const [descText, setDescText] = useState("");
+  const today = new Date().toISOString().split("T")[0];
 
   const fetchSuggestionsRef = useRef(
     debounce(async (query: string) => {
@@ -96,10 +110,37 @@ export default function Submit({ addToast }: Props) {
     fetchSuggestionsRef.current(val);
   };
 
+  const fetchAddressForCoords = async (lat: number, lon: number) => {
+    try {
+      const resp = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`,
+        { headers: { "Accept-Language": "en" } }
+      );
+      const data = await resp.json();
+      if (data) {
+        setAddressLine(data.display_name || "");
+        if (data.address?.postcode) {
+          setPincode(data.address.postcode);
+        }
+        const addressLocality = data.address
+          ? data.address.suburb || data.address.neighbourhood || data.address.quarter || ""
+          : "";
+        setLocality(addressLocality);
+        addToast("Location updated from map click", "info");
+      }
+    } catch (err) {
+      console.error("Reverse geocoding failed", err);
+    }
+  };
+
   const selectSuggestion = (s: Suggestion) => {
     setAddressLine(s.display_name);
     setCoords([parseFloat(s.lat), parseFloat(s.lon)]);
     if (s.address?.postcode) setPincode(s.address.postcode);
+    const addressLocality = s.address
+      ? s.address.suburb || s.address.neighbourhood || s.address.quarter || ""
+      : "";
+    if (addressLocality) setLocality(addressLocality);
     setShowSuggestions(false);
   };
 
@@ -149,9 +190,17 @@ export default function Submit({ addToast }: Props) {
     const fd = new FormData(e.currentTarget);
     const get = (k: string) => ((fd.get(k) as string) || "").trim();
 
+    const code = pincode.trim();
+    if (!code.startsWith("11")) {
+      addToast("Not a Delhi pincode. This platform only supports Delhi initiatives.", "error");
+      setSubmitting(false);
+      return;
+    }
+
     try {
       addTask({
         title: get("title"),
+        shortDescription: get("shortDescription"),
         description: get("description"),
         category: get("category") as TaskCategory,
         applicantType,
@@ -165,11 +214,12 @@ export default function Submit({ addToast }: Props) {
         email: get("email"),
         phone: get("phone"),
         address: addressLine,
-        locality: get("locality"),
+        locality: locality,
         city: get("city") || "New Delhi",
         pincode: pincode,
         eventDate: get("eventDate"),
-        eventTime: get("eventTime"),
+        eventTime: get("eventTime") || undefined,
+        eventDuration: parseInt(get("eventDuration")) || 1,
         volunteersNeeded: parseInt(get("volunteersNeeded")) || 10,
       });
 
@@ -191,10 +241,7 @@ export default function Submit({ addToast }: Props) {
     <div className="container page-section">
       <div className="section-header">
         <h2>Raise a Proposal</h2>
-        <p>
-          Submit your community initiative. Location accuracy helps volunteers
-          find you easily.
-        </p>
+        <p>Submit your community initiative.</p>
       </div>
 
       <div
@@ -375,26 +422,63 @@ export default function Submit({ addToast }: Props) {
           </div>
 
           <div className="form-group">
+            <label htmlFor="shortDescription">
+              Short Description <span className="required">*</span>
+            </label>
+            <input
+              type="text"
+              name="shortDescription"
+              id="shortDescription"
+              required
+              maxLength={200}
+              value={shortDescText}
+              onChange={(e) => setShortDescText(e.target.value)}
+              placeholder="A brief tagline of your initiative (max 200 characters)"
+            />
+            <div style={{ display: "flex", justifyContent: "flex-end", fontSize: "0.78rem", color: "var(--text-muted)", marginTop: "4px" }}>
+              <span>{shortDescText.length} / 200 characters</span>
+            </div>
+          </div>
+
+          <div className="form-group">
             <label htmlFor="description">
-              Description <span className="required">*</span>
+              Detailed Description <span className="required">*</span>
             </label>
             <textarea
               name="description"
               id="description"
               required
-              rows={4}
-              placeholder="What, where, and why?"
+              rows={6}
+              maxLength={1500}
+              value={descText}
+              onChange={(e) => setDescText(e.target.value)}
+              placeholder="Explain the what, where, and why of your initiative (max 1500 characters)"
             />
+            <div style={{ display: "flex", justifyContent: "flex-end", fontSize: "0.78rem", color: "var(--text-muted)", marginTop: "4px" }}>
+              <span>{descText.length} / 1500 characters</span>
+            </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="eventDate">Date <span className="required">*</span></label>
-              <input type="date" name="eventDate" id="eventDate" required />
+              <label htmlFor="eventDate">Proposed Date <span className="required">*</span></label>
+              <input type="date" name="eventDate" id="eventDate" required min={today} />
             </div>
             <div className="form-group">
-              <label htmlFor="eventTime">Time <span className="required">*</span></label>
-              <input type="time" name="eventTime" id="eventTime" required />
+              <label htmlFor="eventTime">Proposed Time</label>
+              <input type="time" name="eventTime" id="eventTime" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="eventDuration">Duration <span className="required">*</span></label>
+              <select name="eventDuration" id="eventDuration" required defaultValue="1">
+                <option value="1">1 day</option>
+                <option value="2">2 days</option>
+                <option value="3">3 days</option>
+                <option value="4">4 days</option>
+                <option value="5">5 days</option>
+                <option value="6">6 days</option>
+                <option value="7">7 days</option>
+              </select>
             </div>
             <div className="form-group">
               <label htmlFor="volunteersNeeded">Volunteers Needed <span className="required">*</span></label>
@@ -425,6 +509,9 @@ export default function Submit({ addToast }: Props) {
             <label htmlFor="address">
               Full Address / Location Search <span className="required">*</span>
             </label>
+            <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: "4px", marginBottom: "8px" }}>
+              Location accuracy helps volunteers find you easily.
+            </p>
             <div style={{ position: "relative", display: "flex", gap: "8px" }}>
               <div style={{ position: "relative", flex: 1 }}>
                 <input
@@ -544,17 +631,19 @@ export default function Submit({ addToast }: Props) {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="locality">Locality</label>
+              <label htmlFor="locality">Locality <span className="required">*</span></label>
               <input
                 type="text"
                 name="locality"
                 id="locality"
                 required
                 placeholder="e.g. Rohini Sector 7"
+                value={locality}
+                onChange={(e) => setLocality(e.target.value)}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="pincode">Pincode</label>
+              <label htmlFor="pincode">Pincode <span className="required">*</span></label>
               <input
                 type="text"
                 name="pincode"
@@ -589,6 +678,12 @@ export default function Submit({ addToast }: Props) {
               />
               <Marker position={coords} />
               <MapUpdater center={coords} />
+              <MapEventsHandler
+                onMapClick={(lat, lon) => {
+                  setCoords([lat, lon]);
+                  fetchAddressForCoords(lat, lon);
+                }}
+              />
             </MapContainer>
           </div>
 
