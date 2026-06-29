@@ -61,13 +61,14 @@ export function LogoFull({ size = 48, className = "" }: LogoProps) {
             justifyContent: "space-between",
             width: "100%",
             marginTop: "4px",
+            gap: `${(size / 48) * 6}px`,
           }}
         >
-          <div style={{ width: `${(size / 48) * 12}px`, height: "1px", background: "var(--text-secondary)", opacity: 0.25 }} />
+          <div style={{ width: `${(size / 48) * 8}px`, height: "1px", background: "var(--text-secondary)", opacity: 0.25 }} />
           <span
             style={{
               fontFamily: "var(--font)",
-              fontSize: `max(9px, ${(size / 48) * 0.44}rem)`,
+              fontSize: `max(8px, ${(size / 48) * 0.44}rem)`,
               fontWeight: 700,
               color: "var(--text-secondary)",
               letterSpacing: "0.8px",
@@ -78,7 +79,7 @@ export function LogoFull({ size = 48, className = "" }: LogoProps) {
           >
             Together for a Better Delhi
           </span>
-          <div style={{ width: `${(size / 48) * 12}px`, height: "1px", background: "var(--text-secondary)", opacity: 0.25 }} />
+          <div style={{ width: `${(size / 48) * 8}px`, height: "1px", background: "var(--text-secondary)", opacity: 0.25 }} />
         </div>
       </div>
     </div>
